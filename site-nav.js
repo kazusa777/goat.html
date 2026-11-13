@@ -83,6 +83,28 @@
     } catch {}
   }
 
+  function setPinned(next) {
+    isPinned = next;
+    nav.classList.toggle('is-pinned', isPinned);
+    pin.textContent = isPinned ? '📍' : '📌';
+    pin.setAttribute('aria-pressed', String(isPinned));
+    pin.setAttribute('aria-label', isPinned ? '取消固定按鈕' : '固定按鈕位置');
+    pin.title = isPinned ? '已固定；按一下恢復自動移動' : '固定目前位置';
+    clearTimeout(movementTimer);
+    if (isPinned) {
+      const rect = nav.getBoundingClientRect();
+      nav.style.transition = 'none';
+      nav.style.left = `${rect.left}px`;
+      nav.style.top = `${rect.top}px`;
+      nav.getBoundingClientRect();
+      nav.style.transition = '';
+      saveState(rect.left, rect.top);
+    } else {
+      saveState();
+      if (!reduceMotion.matches) requestAnimationFrame(moveNavigation);
+    }
+  }
+
   function scheduleMovement() {
     clearTimeout(movementTimer);
     if (isPinned || reduceMotion.matches || dragState || panel.dataset.open === 'true') return;
@@ -112,15 +134,7 @@
   if (!isPinned && !reduceMotion.matches) requestAnimationFrame(moveNavigation);
 
   pin.addEventListener('click', () => {
-    isPinned = !isPinned;
-    nav.classList.toggle('is-pinned', isPinned);
-    pin.textContent = isPinned ? '📍' : '📌';
-    pin.setAttribute('aria-pressed', String(isPinned));
-    pin.setAttribute('aria-label', isPinned ? '取消固定按鈕' : '固定按鈕位置');
-    pin.title = isPinned ? '已固定；按一下恢復自動移動' : '固定目前位置';
-    if (isPinned) clearTimeout(movementTimer);
-    saveState();
-    if (!isPinned) requestAnimationFrame(moveNavigation);
+    setPinned(!isPinned);
   });
 
   toggle.addEventListener('click', () => {
@@ -160,7 +174,7 @@
     dragState = null;
     nav.classList.remove('is-dragging');
     if (moved) {
-      saveState();
+      setPinned(true);
       suppressClick = true;
       setTimeout(() => { suppressClick = false; }, 0);
     }
