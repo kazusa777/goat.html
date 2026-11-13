@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>erobook V4.0 專案流程圖</title>
+  <style>
+    :root {
+      --paper: #f5f5f5;
+      --paper-2: #ececec;
+      --ink: #2d3142;
+      --ink-strong: #111111;
+      --muted: #4f5d75;
+      --soft: #7a8399;
+      --rule: rgba(45,49,66,.12);
+      --rule-solid: #bfc0c0;
+      --accent: #eb6c36;
+      --accent-tint: rgba(235,108,54,.08);
+      --link: #2e5aa8;
+      --sans: 'Geist','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+      --serif: 'Instrument Serif','Noto Serif TC',serif;
+      --mono: 'Geist Mono','Noto Sans Mono CJK TC',ui-monospace,monospace;
+    }
+    *,*::before,*::after { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.65; }
+    main { width:min(100% - 48px,1440px); margin:0 auto; padding:48px 0 36px; }
+    .eyebrow { margin:0 0 8px; color:var(--muted); font:500 8px/1.4 var(--mono); letter-spacing:.18em; text-transform:uppercase; }
+    h1 { margin:0; font:400 clamp(32px,4vw,48px)/1.08 var(--serif); letter-spacing:-.02em; }
+    .intro { max-width:840px; margin:14px 0 22px; color:var(--muted); font-size:15px; }
+    nav { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 44px; }
+    nav a { border:1px solid var(--rule-solid); border-radius:999px; padding:6px 12px; color:var(--ink); text-decoration:none; font-size:13px; }
+    nav a:hover,nav a:focus-visible { border-color:var(--accent); outline:none; }
+    section { margin:0 0 52px; }
+    .section-head { display:flex; align-items:baseline; gap:14px; margin-bottom:8px; }
+    h2 { margin:0; font:400 27px/1.2 var(--serif); }
+    .section-index { color:var(--soft); font:500 9px/1 var(--mono); letter-spacing:.12em; }
+    .section-copy { max-width:900px; margin:0 0 14px; color:var(--muted); font-size:14px; }
+    .diagram-container { width:100%; max-width:100%; min-width:0; overflow-x:auto; overscroll-behavior-x:contain; }
+    svg { display:block; width:100%; min-width:1280px; height:auto; overflow:visible; }
+    .connector { fill:none; stroke:var(--muted); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+    #startup-diagram .connector { marker-end:url(#arrow-startup); }
+    #library-diagram .connector { marker-end:url(#arrow-library); }
+    #downloader-diagram .connector { marker-end:url(#arrow-downloader); }
+    #startup-diagram .connector.accent-line,#library-diagram .connector.accent-line { stroke:var(--accent); stroke-width:1.6; marker-end:url(#arrow-accent); }
+    #downloader-diagram .connector.accent-line { stroke:var(--accent); stroke-width:1.6; marker-end:url(#arrow-accent-downloader); }
+    #downloader-diagram .connector.link-line { stroke:var(--link); marker-end:url(#arrow-link-downloader); }
+    .network-node { fill:rgba(46,90,168,.07); stroke:var(--link); stroke-width:1.4; }
+    .label-mask { fill:var(--paper); }
+    .edge-label { fill:var(--muted); font:400 12px var(--sans); text-anchor:middle; }
+    .edge-label.accent-text { fill:var(--accent); }
+    .node { fill:#fff; stroke:var(--ink); stroke-width:1.2; }
+    .start-node { fill:rgba(45,49,66,.03); stroke:rgba(45,49,66,.42); stroke-width:1.2; }
+    .focal-node { fill:var(--accent-tint); stroke:var(--accent); stroke-width:1.5; }
+    .decision-node { fill:#fff; stroke:var(--ink); stroke-width:1.2; }
+    .node-name { fill:var(--ink); font:600 12px var(--sans); text-anchor:middle; }
+    .node-sub { fill:var(--muted); font:400 12px var(--sans); text-anchor:middle; }
+    .node-tech { fill:var(--muted); font:400 9px var(--mono); text-anchor:middle; }
+    .node-name.accent-text { fill:var(--ink-strong); }
+    .legend-rule { stroke:var(--rule); stroke-width:1; }
+    .legend-title { fill:var(--muted); font:500 8px var(--mono); letter-spacing:.16em; }
+    .legend-label { fill:var(--muted); font:400 12px var(--sans); }
+    .legend-symbol { fill:#fff; stroke:var(--ink); stroke-width:1; }
+    .legend-symbol.start { fill:rgba(45,49,66,.03); stroke:rgba(45,49,66,.42); }
+    .legend-symbol.focal { fill:var(--accent-tint); stroke:var(--accent); }
+    .data-section { margin:18px 0 38px; }
+    .data-section h2 { margin-bottom:12px; }
+    .cards { display:grid; grid-template-columns:1.12fr 1fr .9fr; gap:12px; align-items:stretch; }
+    .card { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:18px 20px; }
+    .card:nth-child(2) { background:rgba(255,255,255,.62); }
+    .card:nth-child(3) { border-top:3px solid var(--accent); padding-top:16px; }
+    .card .eyebrow { margin-bottom:7px; }
+    .card h3 { margin:0 0 6px; font:600 14px/1.35 var(--sans); }
+    .card p { margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
+    code { font-family:var(--mono); font-size:.9em; }
+    footer { border-top:1px solid var(--rule); margin-top:38px; padding-top:14px; color:var(--soft); font:400 9px/1.6 var(--mono); }
+    @media (max-width:700px) {
+      main { width:min(100% - 28px,1440px); padding-top:28px; }
+      nav { margin-bottom:32px; }
+      section { margin-bottom:38px; }
+      .cards { grid-template-columns:1fr; }
+    }
+    @media print {
+      body { background:#fff; }
+      main { width:100%; padding:0; }
+      nav { display:none; }
+      .diagram-container { overflow-x:visible; }
+      svg { min-width:0; }
+      section { break-inside:avoid; margin-bottom:24px; }
+      .cards { grid-template-columns:1.12fr 1fr .9fr; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">ERObook V4.0 · PROJECT WORKFLOW</p>
+    <h1>專案完整流程圖</h1>
+    <p class="intro">從 Electron 啟動與本機書架，到漫畫網站資料、下載佇列和本機匯出。每張圖聚焦一個主要流程，保留使用者可見的分支和資料去向。</p>
+    <nav aria-label="流程圖導覽">
+      <a href="#startup">01 啟動與入口</a>
+      <a href="#library">02 書架與閱讀</a>
+      <a href="#downloader">03 下載與匯出</a>
+      <a href="#storage">資料保存位置</a>
+    </nav>
+  </header>
+
+  <section id="startup" aria-labelledby="startup-heading">
+    <div class="section-head"><span class="section-index">01</span><h2 id="startup-heading">啟動與入口</h2></div>
+    <p class="section-copy">開發時由 <code>npm start</code> 啟動；免安裝版由執行檔啟動。Electron 主程序準備本機設定與 preload IPC 橋接，再依書目索引和起始畫面設定進入功能頁。</p>
+    <div class="diagram-container">
+      <svg id="startup-diagram" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="startup-title startup-desc">
+        <title id="startup-title">erobook 啟動與入口流程</title>
+        <desc id="startup-desc">Electron 啟動後準備本機資料與 IPC 橋接，依 local.db 是否存在進入首次書架掃描或載入既有索引，再依設定開啟主頁、書架管理或漫畫下載器。</desc>
+        <defs>
+          <marker id="arrow-startup" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#4f5d75"/></marker>
+        </defs>
+        <!-- Connectors first -->
+        <path class="connector" d="M640 88V112"/>
+        <path class="connector" d="M640 168V200"/>
+        <path class="connector" d="M708 244H832Q840 244 840 252V328"/>
+        <path class="connector" d="M640 288V296Q640 304 632 304H448Q440 304 440 312V328"/>
+        <path class="connector" d="M440 392V408Q440 416 448 416H596Q604 416 604 424V446"/>
+        <path class="connector" d="M840 392V416Q840 424 832 424H684Q676 424 676 432V446"/>
+        <path class="connector" d="M570 468H248Q240 468 240 476V552"/>
+        <path class="connector" d="M640 512V552"/>
+        <path class="connector" d="M710 468H1032Q1040 468 1040 476V552"/>
+        <!-- Edge labels with opaque masks -->
+        <g><rect class="label-mask" x="744" y="218" width="34" height="20" rx="3"/><text class="edge-label" x="761" y="233">有</text></g>
+        <g><rect class="label-mask" x="536" y="278" width="34" height="20" rx="3"/><text class="edge-label" x="553" y="293">無</text></g>
+        <g><rect class="label-mask" x="326" y="442" width="42" height="20" rx="3"/><text class="edge-label" x="347" y="457">主頁</text></g>
+        <g><rect class="label-mask" x="648" y="520" width="42" height="20" rx="3"/><text class="edge-label" x="669" y="535">書架</text></g>
+        <g><rect class="label-mask" x="914" y="442" width="58" height="20" rx="3"/><text class="edge-label" x="943" y="457">下載器</text></g>
+        <!-- Nodes -->
+        <rect class="start-node" x="560" y="40" width="160" height="48" rx="24"/>
+        <text class="node-name" x="640" y="61">啟動 erobook</text>
+
+        <rect class="node" x="456" y="112" width="368" height="56" rx="6"/>
+        <text class="node-name" x="640" y="136">Electron 主程序初始化</text>
+        <text class="node-sub" x="640" y="154">準備 LibraryData、預設設定與 preload IPC 橋接</text>
+
+        <polygon class="decision-node" points="640,200 708,244 640,288 572,244"/>
+        <text class="node-name" x="640" y="241">已有</text>
+        <text class="node-name" x="640" y="258">local.db？</text>
+
+        <rect class="node" x="320" y="328" width="240" height="64" rx="6"/>
+        <text class="node-name" x="440" y="353">設定書架並掃描</text>
+        <text class="node-sub" x="440" y="373">成功找到書籍後建立索引</text>
+
+        <rect class="focal-node" x="720" y="328" width="240" height="64" rx="6"/>
+        <text class="node-name accent-text" x="840" y="353">載入既有書目索引</text>
+        <text class="node-sub" x="840" y="373">保留已保存的書架與偏好</text>
+
+        <polygon class="decision-node" points="640,424 710,468 640,512 570,468"/>
+        <text class="node-name" x="640" y="465">依設定選擇</text>
+        <text class="node-name" x="640" y="482">起始畫面</text>
+
+        <rect class="start-node" x="120" y="552" width="240" height="56" rx="28"/>
+        <text class="node-name" x="240" y="585">主頁</text>
+
+        <rect class="start-node" x="520" y="552" width="240" height="56" rx="28"/>
+        <text class="node-name" x="640" y="585">書架管理</text>
+
+        <rect class="start-node" x="920" y="552" width="240" height="56" rx="28"/>
+        <text class="node-name" x="1040" y="585">漫畫下載器</text>
+
+        <line class="legend-rule" x1="40" y1="640" x2="1240" y2="640"/>
+        <text class="legend-title" x="40" y="657">LEGEND · SHAPE CARRIES NODE TYPE</text>
+        <rect class="legend-symbol start" x="340" y="648" width="32" height="16" rx="8"/>
+        <text class="legend-label" x="380" y="662">入口／頁面</text>
+        <rect class="legend-symbol" x="524" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="564" y="662">處理步驟</text>
+        <polygon class="legend-symbol" points="716,656 732,648 748,656 732,664"/>
+        <text class="legend-label" x="756" y="662">判斷</text>
+        <rect class="legend-symbol focal" x="864" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="904" y="662">主要資料路徑</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="library" aria-labelledby="library-heading">
+    <div class="section-head"><span class="section-index">02</span><h2 id="library-heading">書架與閱讀</h2></div>
+    <p class="section-copy">既有索引可直接瀏覽；管理書架時選擇路徑和掃描深度，掃描成功後更新 SQLite。書籍可進入閱讀器，也能管理檔案或執行重複比對。</p>
+    <div class="diagram-container">
+      <svg id="library-diagram" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="library-title library-desc">
+        <title id="library-title">書架管理與閱讀流程</title>
+        <desc id="library-desc">從主頁或書架頁選擇直接瀏覽或管理書架，管理時掃描資料夾與 ZIP、CBZ 並更新 SQLite 索引；瀏覽後可閱讀、管理書籍或執行重複比對。</desc>
+        <defs>
+          <marker id="arrow-library" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#eb6c36"/></marker>
+        </defs>
+        <!-- Connectors first -->
+        <path class="connector" d="M640 88V112"/>
+        <path class="connector" d="M570 156H208Q200 156 200 164V252"/>
+        <path class="connector" d="M710 156H1032Q1040 156 1040 164V344"/>
+        <path class="connector" d="M320 284V368Q320 376 328 376H400"/>
+        <path class="connector" d="M640 376H920"/>
+        <path class="connector" d="M1040 408V432"/>
+        <path class="connector accent-line" d="M570 476H208Q200 476 200 484V560"/>
+        <path class="connector" d="M640 520V560"/>
+        <path class="connector" d="M710 476H1072Q1080 476 1080 484V560"/>
+        <!-- Edge labels -->
+        <g><rect class="label-mask" x="296" y="128" width="94" height="20" rx="3"/><text class="edge-label" x="343" y="143">變更或重掃</text></g>
+        <g><rect class="label-mask" x="774" y="128" width="66" height="20" rx="3"/><text class="edge-label" x="807" y="143">直接瀏覽</text></g>
+        <g><rect class="label-mask" x="332" y="450" width="42" height="20" rx="3"/><text class="edge-label" x="353" y="465">閱讀</text></g>
+        <g><rect class="label-mask" x="648" y="528" width="42" height="20" rx="3"/><text class="edge-label" x="669" y="543">管理</text></g>
+        <g><rect class="label-mask" x="896" y="450" width="58" height="20" rx="3"/><text class="edge-label" x="925" y="465">重複比對</text></g>
+        <!-- Nodes -->
+        <rect class="start-node" x="560" y="40" width="160" height="48" rx="24"/>
+        <text class="node-name" x="640" y="61">主頁／書架</text>
+
+        <polygon class="decision-node" points="640,112 710,156 640,200 570,156"/>
+        <text class="node-name" x="640" y="153">要管理或</text>
+        <text class="node-name" x="640" y="170">重掃書架？</text>
+
+        <rect class="node" x="80" y="252" width="240" height="64" rx="6"/>
+        <text class="node-name" x="200" y="277">設定路徑並掃描書架</text>
+        <text class="node-sub" x="200" y="297">含 output\漫畫；選深度並讀取 ZIP／CBZ</text>
+
+        <rect class="node" x="400" y="344" width="240" height="64" rx="6"/>
+        <text class="node-name" x="520" y="369">建立或更新索引</text>
+        <text class="node-sub" x="520" y="389">寫入書名、路徑與書目欄位</text>
+
+        <rect class="node" x="920" y="344" width="240" height="64" rx="6"/>
+        <text class="node-name" x="1040" y="369">瀏覽、搜尋與排序</text>
+        <text class="node-sub" x="1040" y="389">封面／圖示／清單與書架篩選</text>
+
+        <polygon class="decision-node" points="640,432 710,476 640,520 570,476"/>
+        <text class="node-name" x="640" y="473">選擇</text>
+        <text class="node-name" x="640" y="490">書籍操作</text>
+
+        <rect class="focal-node" x="80" y="560" width="240" height="56" rx="6"/>
+        <text class="node-name accent-text" x="200" y="584">閱讀器</text>
+        <text class="node-sub" x="200" y="604">翻頁、縮放、快取、書間導覽</text>
+
+        <rect class="node" x="520" y="560" width="240" height="56" rx="6"/>
+        <text class="node-name" x="640" y="584">書籍管理</text>
+        <text class="node-sub" x="640" y="604">詳情、標籤、重新命名、移至資源回收桶</text>
+
+        <rect class="node" x="960" y="560" width="240" height="56" rx="6"/>
+        <text class="node-name" x="1080" y="584">重複比對</text>
+        <text class="node-sub" x="1080" y="604">SHA-256 完全重複或相似圖片</text>
+
+        <line class="legend-rule" x1="40" y1="640" x2="1240" y2="640"/>
+        <text class="legend-title" x="40" y="657">LEGEND · SHAPE CARRIES NODE TYPE</text>
+        <rect class="legend-symbol start" x="340" y="648" width="32" height="16" rx="8"/>
+        <text class="legend-label" x="380" y="662">入口／頁面</text>
+        <rect class="legend-symbol" x="524" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="564" y="662">處理步驟</text>
+        <polygon class="legend-symbol" points="716,656 732,648 748,656 732,664"/>
+        <text class="legend-label" x="756" y="662">判斷</text>
+        <rect class="legend-symbol focal" x="864" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="904" y="662">主要操作</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="downloader" aria-labelledby="downloader-heading">
+    <div class="section-head"><span class="section-index">03</span><h2 id="downloader-heading">漫畫下載與匯出</h2></div>
+    <p class="section-copy">下載器 Vue 畫面透過 preload IPC 呼叫 Electron 主程序中的後端。網站瀏覽、登入需求、任務佇列、暫存、匯出與回到本機書架如下。</p>
+    <div class="diagram-container">
+      <svg id="downloader-diagram" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="downloader-title downloader-desc">
+        <title id="downloader-title">漫畫下載與匯出流程</title>
+        <desc id="downloader-desc">下載器初始化設定後選擇搜尋、更新、排行或我的書架；我的書架需要登入，後端透過 HTTPS 取得資料，再將漫畫加入下載佇列，完成下載和匯出後可手動加入本機書架。</desc>
+        <defs>
+          <marker id="arrow-downloader" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent-downloader" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#eb6c36"/></marker>
+          <marker id="arrow-link-downloader" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0L8 3L0 6Z" fill="#2e5aa8"/></marker>
+        </defs>
+        <!-- Connectors first -->
+        <path class="connector" d="M640 88V104"/>
+        <path class="connector" d="M640 152V168"/>
+        <path class="connector" d="M640 216V240"/>
+        <path class="connector link-line" d="M710 284H840"/>
+        <path class="connector link-line" d="M640 328V352"/>
+        <path class="connector link-line" d="M960 316V328Q960 336 952 336H808Q800 336 800 344V376"/>
+        <path class="connector" d="M640 400V424"/>
+        <path class="connector" d="M640 472V496"/>
+        <path class="connector accent-line" d="M640 544V568"/>
+        <!-- Edge labels -->
+        <g><rect class="label-mask" x="744" y="258" width="34" height="20" rx="3"/><text class="edge-label" x="761" y="273">是</text></g>
+        <g><rect class="label-mask" x="648" y="330" width="34" height="20" rx="3"/><text class="edge-label" x="665" y="345">否</text></g>
+        <!-- Nodes -->
+        <rect class="start-node" x="560" y="40" width="160" height="48" rx="24"/>
+        <text class="node-name" x="640" y="53">開啟漫畫下載器</text>
+
+        <rect class="node" x="480" y="104" width="320" height="48" rx="6"/>
+        <text class="node-name" x="640" y="124">初始化下載器</text>
+        <text class="node-sub" x="640" y="142">舊設定或預設值；準備 data／output</text>
+
+        <rect class="node" x="480" y="168" width="320" height="48" rx="6"/>
+        <text class="node-name" x="640" y="188">選擇內容來源</text>
+        <text class="node-sub" x="640" y="206">搜尋、更新列表、排行或我的書架</text>
+
+        <polygon class="decision-node" points="640,240 710,284 640,328 570,284"/>
+        <text class="node-name" x="640" y="281">需要帳號</text>
+        <text class="node-name" x="640" y="298">登入？</text>
+
+        <rect class="node" x="840" y="252" width="240" height="64" rx="6"/>
+        <text class="node-name" x="960" y="277">登入或貼上 Cookie</text>
+        <text class="node-sub" x="960" y="297">我的書架與帳號資訊才需要</text>
+
+        <rect class="network-node" x="480" y="352" width="320" height="48" rx="6"/>
+        <text class="node-name" x="640" y="372">取得列表、詳情與縮圖</text>
+        <text class="node-sub" x="640" y="390">HTTPS · API 網域自動備援 · 依設定使用代理</text>
+
+        <rect class="node" x="480" y="424" width="320" height="48" rx="6"/>
+        <text class="node-name" x="640" y="444">選擇作品並建立下載任務</text>
+        <text class="node-sub" x="640" y="462">單本、章節、勾選項目或整個書架</text>
+
+        <rect class="focal-node" x="480" y="496" width="320" height="48" rx="6"/>
+        <text class="node-name accent-text" x="640" y="516">下載管理器處理圖片</text>
+        <text class="node-sub" x="640" y="534">暫存、並行／轉檔；可暫停、繼續、取消</text>
+
+        <rect class="start-node" x="480" y="568" width="320" height="48" rx="24"/>
+        <text class="node-name" x="640" y="588">完成並輸出到漫畫資料夾</text>
+        <text class="node-sub" x="640" y="606">中繼資料可選 · CBZ／PDF · 加書架後重新掃描</text>
+
+        <line class="legend-rule" x1="40" y1="640" x2="1240" y2="640"/>
+        <text class="legend-title" x="40" y="657">LEGEND · SHAPE CARRIES NODE TYPE</text>
+        <rect class="legend-symbol start" x="300" y="648" width="32" height="16" rx="8"/>
+        <text class="legend-label" x="340" y="662">入口／完成</text>
+        <rect class="legend-symbol" x="484" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="524" y="662">處理步驟</text>
+        <polygon class="legend-symbol" points="676,656 692,648 708,656 692,664"/>
+        <text class="legend-label" x="716" y="662">判斷</text>
+        <rect class="legend-symbol focal" x="824" y="648" width="32" height="16" rx="3"/>
+        <text class="legend-label" x="864" y="662">下載主流程</text>
+        <line x1="1020" y1="656" x2="1052" y2="656" stroke="#2e5aa8" stroke-width="1.4" marker-end="url(#arrow-link-downloader)"/>
+        <text class="legend-label" x="1060" y="662">網路請求</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="storage" class="data-section" aria-labelledby="storage-heading">
+    <p class="eyebrow">DATA DESTINATIONS</p>
+    <h2 id="storage-heading">三種資料，各自保存</h2>
+    <div class="cards">
+      <article class="card">
+        <p class="eyebrow">LOCAL LIBRARY</p>
+        <h3>書架設定與索引</h3>
+        <p>開發時：專案根目錄的 <code>LibraryData\setting\local\</code>；打包後：執行檔旁的 <code>LibraryData\setting\local\</code>。<br>保存書架路徑、偏好、搜尋紀錄和 SQLite 書目索引；漫畫原檔仍在使用者選擇的位置。</p>
+      </article>
+      <article class="card">
+        <p class="eyebrow">DOWNLOADER DATA</p>
+        <h3>下載器設定與日誌</h3>
+        <p>位於程式旁的 <code>data</code>；包含下載器設定、API 網域記憶和日誌，與書架索引分開。</p>
+      </article>
+      <article class="card">
+        <p class="eyebrow">COMIC OUTPUT</p>
+        <h3>漫畫與匯出檔</h3>
+        <p>下載圖片、可選中繼資料、CBZ 和 PDF 放在輸出目錄的 <code>漫畫\書名</code>。要在書架閱讀，需把輸出目錄加入書架並重新掃描。</p>
+      </article>
+    </div>
+  </section>
+
+  <footer>Scope: user-visible end-to-end flows based on the current source and README. IPC channel names, every setting field, parser branches, and image-processing internals are grouped into their parent steps.</footer>
+</main>
+</body>
+</html>
