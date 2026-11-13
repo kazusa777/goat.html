@@ -1,0 +1,57 @@
+name: Add shared page navigation
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**/*.html'
+      - '**/*.htm'
+      - 'site-nav.js'
+      - '.github/workflows/add-page-navigation.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  add-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Add navigation script to HTML pages
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+          import subprocess
+
+          root = Path.cwd()
+          changed = []
+          for page in root.rglob('*'):
+              if not page.is_file() or page.suffix.lower() not in {'.html', '.htm'}:
+                  continue
+              if '.git' in page.parts or 'node_modules' in page.parts:
+                  continue
+              source = page.read_text(encoding='utf-8-sig')
+              if 'data-goat-site-nav' in source:
+                  continue
+              relative_script = os.path.relpath(root / 'site-nav.js', page.parent).replace(os.sep, '/')
+              tag = f'<script src="{relative_script}" data-goat-site-nav defer></script>'
+              closing_body = re.search(r'</body\s*>', source, re.IGNORECASE)
+              if closing_body:
+                  source = source[:closing_body.start()] + tag + '\n' + source[closing_body.start():]
+              else:
+                  source += '\n' + tag + '\n'
+              page.write_text(source, encoding='utf-8')
+              changed.append(page.relative_to(root).as_posix())
+
+          if changed:
+              subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
+              subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
+              subprocess.run(['git', 'add', '--', *changed], check=True)
+              subprocess.run(['git', 'commit', '-m', 'Add shared navigation to HTML pages'], check=True)
+              subprocess.run(['git', 'push'], check=True)
+          PY

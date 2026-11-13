@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <style>
+    body { margin: 32px; color: #111; background: #fff; font: 16px/1.6 Arial, "Microsoft JhengHei", sans-serif; }
+    h1 { margin: 0 0 4px; font-size: 26px; }
+    p { margin: 0 0 18px; }
+    input { width: min(360px, 90%); padding: 6px; font: inherit; }
+    ul { padding-left: 24px; }
+    li { margin: 7px 0; }
+    small { margin-left: 8px; color: #777; }
+    #status { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Home</h1>
+  <p>一些自己做的小東西，想看哪個就點下去。</p>
+  <input id="search" type="search" placeholder="找網頁…" aria-label="搜尋網頁">
+  <span id="status">讀取中…</span>
+  <ul id="pages"><li>讀取中…</li></ul>
+  <script>
+    (() => {
+      const owner = 'kazusa777';
+      const repo = 'goat.html';
+      const search = document.querySelector('#search');
+      const list = document.querySelector('#pages');
+      const status = document.querySelector('#status');
+      let pages = [];
+
+      const label = path => path.split('/').pop().replace(/\.html?$/i, '').replace(/[-_]+/g, ' ');
+      function render() {
+        const term = search.value.trim().toLocaleLowerCase();
+        const shown = pages.filter(page => `${page.name} ${page.path}`.toLocaleLowerCase().includes(term));
+        list.replaceChildren();
+        status.textContent = `${shown.length} 個網頁`;
+        for (const page of shown) {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = page.url;
+          link.textContent = page.name;
+          li.append(link);
+          const path = document.createElement('small');
+          path.textContent = page.path;
+          li.append(path);
+          list.append(li);
+        }
+        if (!shown.length) list.innerHTML = '<li>沒有符合的網頁。</li>';
+      }
+
+      async function load() {
+        try {
+          const api = `https://api.github.com/repos/${owner}/${encodeURIComponent(repo)}`;
+          const infoResponse = await fetch(api);
+          if (!infoResponse.ok) throw new Error(`GitHub API ${infoResponse.status}`);
+          const info = await infoResponse.json();
+          const treeResponse = await fetch(`${api}/git/trees/${encodeURIComponent(info.default_branch)}?recursive=1`);
+          if (!treeResponse.ok) throw new Error(`GitHub API ${treeResponse.status}`);
+          const tree = await treeResponse.json();
+          const script = document.querySelector('script[src*="site-nav.js"]');
+          const root = script ? new URL('./', script.src) : new URL('./', location.href);
+          pages = (tree.tree || [])
+            .filter(file => file.type === 'blob' && /\.html?$/i.test(file.path))
+            .map(file => ({ path: file.path, name: label(file.path), url: new URL(file.path.split('/').map(encodeURIComponent).join('/'), root).href }))
+            .sort((a, b) => a.path.localeCompare(b.path, 'zh-Hant'));
+          render();
+        } catch (error) {
+          status.textContent = '清單讀取失敗';
+          list.innerHTML = `<li>${error.message}；請用 GitHub Pages 網址開啟。</li>`;
+        }
+      }
+      search.addEventListener('input', render);
+      load();
+    })();
+  </script>
+  <script src="./site-nav.js" data-goat-site-nav defer></script>
+</body>
+</html>
