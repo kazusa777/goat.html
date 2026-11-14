@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>常用 Windows 批次檔 (.bat) 腳本介紹</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        h1 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        .script-box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>常用 Windows 批次檔 (.bat) 腳本介紹</h1>
+    <p>這裡整理了五個常用的自動化小腳本，幫你省去重複點擊滑鼠的麻煩：</p>
+
+    <div class="script-box">
+        <h2>1. 快速開啟「網路連線」設定</h2>
+        <p><strong>功能說明：</strong>直接呼叫 Windows 控制台的網路介面卡設定視窗（<code>ncpa.cpl</code>），不用再層層點選控制台，執行完自動關閉視窗。</p>
+        <pre><code>@echo off
+start ncpa.cpl
+exit</code></pre>
+    </div>
+
+    <div class="script-box">
+        <h2>2. 快速開啟「電源選項」設定</h2>
+        <p><strong>功能說明：</strong>直接開啟系統的電源管理設定（<code>powercfg.cpl</code>），方便快速切換效能模式或調整休眠設定。</p>
+        <pre><code>@echo off
+start control powercfg.cpl
+exit</code></pre>
+    </div>
+
+    <div class="script-box">
+        <h2>3. 批次壓縮資料夾（含排除功能）</h2>
+        <p><strong>功能說明：</strong>將當前目錄下的所有子資料夾，透過 WinRAR 分別壓縮成獨立的 <code>.zip</code> 檔，並可設定跳過特定名稱的資料夾。執行完畢會暫停畫面供確認。</p>
+        <pre><code>@echo off
+chcp 65001 &gt;nul
+for /d %%i in (*) do (
+    if /i not "%%i"=="要排除的資料夾名稱1" if /i not "%%i"=="要排除的資料夾名稱2" if /i not "%%i"=="要排除的資料夾名稱3" (
+        "C:\Program Files\WinRAR\WinRAR.exe" a -afzip "%%i.zip" "%%i\"
+    )
+)
+pause</code></pre>
+    </div>
+
+    <div class="script-box">
+        <h2>4. GPU 加速批次檢查影片損壞</h2>
+        <p><strong>功能說明：</strong>掃描當前資料夾內的常見影片格式（mp4, mkv, avi, mov），利用 FFmpeg 搭配 NVIDIA CUDA 硬體加速解碼測試。若發現壞軌或編碼錯誤，會自動將錯誤訊息輸出至 <code>error_log.txt</code>。</p>
+        <pre><code>@echo off
+chcp 65001 &gt;nul
+echo 開始使用 GPU 檢查資料夾內的所有影片...
+echo ========================================
+
+for %%f in (*.mp4 *.mkv *.avi *.mov) do (
+    echo 正在檢查: "%%f"
+    ffmpeg -hwaccel cuda -v error -i "%%f" -f null - 2&gt;&gt; error_log.txt
+)
+
+echo ========================================
+echo 檢查完畢！如果有發現壞軌或錯誤，會記錄在 error_log.txt 裡面。
+pause</code></pre>
+    </div>
+
+    <div class="script-box">
+        <h2>5. 一鍵啟動 Node.js 專案</h2>
+        <p><strong>功能說明：</strong>先將工作路徑切換到這個批次檔所在的資料夾（避免路徑錯誤），接著執行 <code>npm start</code> 啟動專案伺服器。</p>
+        <pre><code>@echo off
+cd /d "%~dp0"
+npm start
+pause</code></pre>
+    </div>
+
+</body>
+</html>
