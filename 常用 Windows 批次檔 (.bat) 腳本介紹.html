@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
+
     <meta charset="UTF-8">
     <title>常用 Windows 批次檔 (.bat) 腳本介紹</title>
     <style>
@@ -28,8 +29,10 @@
             border: 1px solid #ddd;
         }
     </style>
+
 </head>
 <body>
+
 
     <h1>常用 Windows 批次檔 (.bat) 腳本介紹</h1>
 
@@ -89,6 +92,18 @@ npm start
 pause</code></pre>
     </div>
 
-<script src="site-nav.js" data-goat-site-nav defer></script>
+    <div class="script-box">
+        <h2>6. 一鍵啟動 Python 虛擬環境專案</h2>
+        <p><strong>功能說明：</strong>先將工作路徑切換到這個批次檔所在的資料夾（避免路徑錯誤），接著呼叫專案內建的 <code data-path-to-node="1" data-index-in-node="82">.venv</code> 虛擬環境執行 <code data-path-to-node="1" data-index-in-node="95">main.py</code> 主程式。</p>
+        <pre><code>@echo off
+cd /d "%~dp0"
+.\.venv\Scripts\python.exe main.py
+pause</code></pre>
+    </div>
+
+<script src="site-nav.js" data-goat-site-nav="" defer=""></script>
+
+
+
 </body>
 </html>
