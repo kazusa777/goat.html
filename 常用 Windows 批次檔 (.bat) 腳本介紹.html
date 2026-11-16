@@ -21,12 +21,41 @@
             padding: 15px;
             margin-bottom: 20px;
             background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .box-header h2 {
+            margin: 0;
+        }
+        .download-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .download-btn:hover {
+            background-color: #004c99;
+        }
+        .download-btn:active {
+            transform: translateY(1px);
         }
         pre {
             background-color: #eee;
             padding: 10px;
             overflow-x: auto;
             border: 1px solid #ddd;
+            margin-bottom: 0;
         }
     </style>
 
@@ -37,7 +66,10 @@
     <h1>常用 Windows 批次檔 (.bat) 腳本介紹</h1>
 
     <div class="script-box">
-        <h2>1. 快速開啟「網路連線」設定</h2>
+        <div class="box-header">
+            <h2>1. 快速開啟「網路連線」設定&nbsp;</h2>
+            <button class="download-btn" onclick="downloadBat(this, '網路介面.bat')">下載 .bat 檔</button>
+        </div>
         <p><strong>功能說明：</strong>直接呼叫 Windows 控制台的網路介面卡設定視窗（<code>ncpa.cpl</code>），不用再層層點選控制台，執行完自動關閉視窗。</p>
         <pre><code>@echo off
 start ncpa.cpl
@@ -45,7 +77,10 @@ exit</code></pre>
     </div>
 
     <div class="script-box">
-        <h2>2. 快速開啟「電源選項」設定</h2>
+        <div class="box-header">
+            <h2>2. 快速開啟「電源選項」設定</h2>
+            <button class="download-btn" onclick="downloadBat(this, '電源選項.bat')">下載 .bat 檔</button>
+        </div>
         <p><strong>功能說明：</strong>直接開啟系統的電源管理設定（<code>powercfg.cpl</code>），方便快速切換效能模式或調整休眠設定。</p>
         <pre><code>@echo off
 start control powercfg.cpl
@@ -53,7 +88,10 @@ exit</code></pre>
     </div>
 
     <div class="script-box">
-        <h2>3. 批次壓縮資料夾（含排除功能）</h2>
+        <div class="box-header">
+            <h2>3. 批次壓縮資料夾（含排除功能）</h2>
+            <button class="download-btn" onclick="downloadBat(this, '批次壓縮資料夾.bat')">下載 .bat 檔</button>
+        </div>
         <p><strong>功能說明：</strong>將當前目錄下的所有子資料夾，透過 WinRAR 分別壓縮成獨立的 <code>.zip</code> 檔，並可設定跳過特定名稱的資料夾。執行完畢會暫停畫面供確認。</p>
         <pre><code>@echo off
 chcp 65001 &gt;nul
@@ -66,7 +104,10 @@ pause</code></pre>
     </div>
 
     <div class="script-box">
-        <h2>4. GPU 加速批次檢查影片損壞</h2>
+        <div class="box-header">
+            <h2>4. GPU 加速批次檢查影片損壞</h2>
+            <button class="download-btn" onclick="downloadBat(this, 'GPU批次檢查影片.bat')">下載 .bat 檔</button>
+        </div>
         <p><strong>功能說明：</strong>掃描當前資料夾內的常見影片格式（mp4, mkv, avi, mov），利用 FFmpeg 搭配 NVIDIA CUDA 硬體加速解碼測試。若發現壞軌或編碼錯誤，會自動將錯誤訊息輸出至 <code>error_log.txt</code>。</p>
         <pre><code>@echo off
 chcp 65001 &gt;nul
@@ -84,7 +125,10 @@ pause</code></pre>
     </div>
 
     <div class="script-box">
-        <h2>5. 一鍵啟動 Node.js 專案</h2>
+        <div class="box-header">
+            <h2>5. 一鍵啟動 Node.js 專案</h2>
+            <button class="download-btn" onclick="downloadBat(this, '啟動Node專案.bat')">下載 .bat 檔</button>
+        </div>
         <p><strong>功能說明：</strong>先將工作路徑切換到這個批次檔所在的資料夾（避免路徑錯誤），接著執行 <code>npm start</code> 啟動專案伺服器。</p>
         <pre><code>@echo off
 cd /d "%~dp0"
@@ -93,15 +137,43 @@ pause</code></pre>
     </div>
 
     <div class="script-box">
-        <h2>6. 一鍵啟動 Python 虛擬環境專案</h2>
-        <p><strong>功能說明：</strong>先將工作路徑切換到這個批次檔所在的資料夾（避免路徑錯誤），接著呼叫專案內建的 <code data-path-to-node="1" data-index-in-node="82">.venv</code> 虛擬環境執行 <code data-path-to-node="1" data-index-in-node="95">main.py</code> 主程式。</p>
+        <div class="box-header">
+            <h2>6. 一鍵啟動 Python 虛擬環境專案</h2>
+            <button class="download-btn" onclick="downloadBat(this, '啟動Python專案.bat')">下載 .bat 檔</button>
+        </div>
+        <p><strong>功能說明：</strong>先將工作路徑切換到這個批次檔所在的資料夾（避免路徑錯誤），接著呼叫專案內建的 <code>.venv</code> 虛擬環境執行 <code>main.py</code> 主程式。</p>
         <pre><code>@echo off
 cd /d "%~dp0"
 .\.venv\Scripts\python.exe main.py
 pause</code></pre>
     </div>
 
-<script src="site-nav.js" data-goat-site-nav="" defer=""></script>
+    <script>
+        function downloadBat(buttonElement, filename) {
+            // 找到同一個區塊內的 code 標籤並取得文字內容
+            const scriptBox = buttonElement.closest('.script-box');
+            const codeContent = scriptBox.querySelector('pre code').innerText;
+
+            // 將換行符號統一轉換為 Windows 的 CRLF (\r\n)，確保批次檔執行正常
+            const windowsFormattedContent = codeContent.replace(/\r?\n/g, '\r\n');
+
+            // 建立 Blob 物件並觸發下載
+            const blob = new Blob([windowsFormattedContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            // 清理暫存元素與 URL
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+    <script src="site-nav.js" data-goat-site-nav="" defer=""></script>
 
 
 
